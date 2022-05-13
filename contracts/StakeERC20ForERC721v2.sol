@@ -12,6 +12,7 @@ interface ScoreSource {
 }
 
 library ERC721Fungible {
+    /// @dev This loop can consume a lot of gas, this is because we need a way to send a specific `amount` of ERC721Enumerable tokens regardless of their IDs
     function transferManyFrom(IERC721Enumerable token, address from, address to, uint256 amount) internal {
         uint256 balance = token.balanceOf(from);
         for (uint256 i = 0; i < amount; i++)
@@ -25,6 +26,7 @@ contract StakeERC20ForERC721v2 is AccessControl, ERC721Holder, ScoreSource {
 
     // Errors
 
+    error InvalidConstruction();
     error NotEnoughStaked();
     error NotEnoughScore();
 
@@ -65,6 +67,7 @@ contract StakeERC20ForERC721v2 is AccessControl, ERC721Holder, ScoreSource {
     // Constructor
 
     constructor(IERC20 _token, IERC721Enumerable _reward, uint256 _price, ScoreSource _externalScores) {
+        if (address(_token) == address(_reward)) revert InvalidConstruction();
         token = _token;
         reward = _reward;
         price = _price;
